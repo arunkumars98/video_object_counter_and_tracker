@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>YOLOv8 Object Detection</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f3f4f6;
+            margin: 0;
+            padding: 0;
+            text-align: center;
+        }
+
+        h1 {
+            background-color: #111827;
+            color: white;
+            padding: 20px 0;
+            margin: 0;
+        }
+
+        form {
+            margin: 20px auto;
+            padding: 20px;
+            background: white;
+            max-width: 400px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            border-radius: 10px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 10px;
+            font-weight: bold;
+        }
+
+        input[type="file"] {
+            margin-bottom: 15px;
+        }
+
+        button {
+            background-color: #2563eb;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            font-size: 16px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }
+
+        button:hover {
+            background-color: #1d4ed8;
+        }
+
+        h2 {
+            margin-top: 40px;
+            color: #111827;
+        }
+
+        #stats {
+            background: white;
+            display: inline-block;
+            text-align: left;
+            padding: 20px;
+            margin: 20px auto;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        img {
+            margin-top: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            max-width: 90%;
+            height: auto;
+        }
+
+        p {
+            margin: 8px 0;
+        }
+
+        strong {
+            color: #111827;
+        }
+    </style>
+</head>
+<body>
+    <h1>YOLOv8 Object Detection and Tracking</h1>
+
+    <form action="/upload" method="post" enctype="multipart/form-data">
+        <label>Upload Video File:</label>
+        <input type="file" name="video" required>
+        <button type="submit">Upload and Start</button>
+    </form>
+
+    <form action="/camera" method="post">
+        <button type="submit">Use Camera Feed</button>
+    </form>
+
+    <h2>Live Feed:</h2>
+    <img src="{{ url_for('video_feed') }}" width="800">
+
+    <h2>Statistics</h2>
+    <div id="stats">
+        <p><strong>Global Count:</strong> <span id="global-count">0</span></p>
+        <div id="zone-counts"></div>
+    </div>
+
+    <script>
+        async function fetchStats() {
+            const response = await fetch('/stats');
+            const data = await response.json();
+            document.getElementById('global-count').textContent = data.global_count;
+
+            const zoneDiv = document.getElementById('zone-counts');
+            zoneDiv.innerHTML = '';
+            for (let zone in data.zone_counts) {
+                zoneDiv.innerHTML += `<p><strong>${zone}:</strong> ${data.zone_counts[zone]}</p>`;
+            }
+        }
+
+        setInterval(fetchStats, 1000);
+    </script>
+</body>
+</html>
